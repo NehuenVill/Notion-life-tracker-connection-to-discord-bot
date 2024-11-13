@@ -16,13 +16,13 @@ headers = {
 }
 
 emotions = {
-    "happy":{"relation": [{"id": "d3482d26e02b4eba8f09780593a2abbc"}]},
-    "sad":{"relation": [{"id": "Sad-54bf3fca417b4bc6acca1737f839dd44"}]},
-    "fear":{"relation": [{"id": "Fear-1318842944f4801484d9ce051fba0cda"}]},
-    "motivated":{"relation": [{"id": "Motivated-b6520518f99a41e6ab65c42475792ab3"}]},
-    "relief":{"relation": [{"id": "Relief-1308842944f480a5aba3c7e4ca78cfa0"}]},
-    "curious":{"relation": [{"id": "Curious-1308842944f480a4bdafc5d35c6d28c4"}]},
-    "anger":{"relation": [{"id": "Anger-1318842944f480adb28fc5feada0af8a"}]}
+    "happy":{"relation": [{"id":   "d3482d26e02b4eba8f09780593a2abbc"}]},
+    "sad":{"relation": [{"id":     "54bf3fca417b4bc6acca1737f839dd44"}]},
+    "fear":{"relation": [{"id":    "1318842944f4801484d9ce051fba0cda"}]},
+    "motivated":{"relation": [{"id":"b6520518f99a41e6ab65c42475792ab3"}]},
+    "relief":{"relation": [{"id":  "1308842944f480a5aba3c7e4ca78cfa0"}]},
+    "curious":{"relation": [{"id": "1308842944f480a4bdafc5d35c6d28c4"}]},
+    "anger":{"relation": [{"id":   "1318842944f480adb28fc5feada0af8a"}]}
 }
 
 def add_event_to_notion(name, description, date, picture_url, emotion):
@@ -80,13 +80,14 @@ def add_event_to_notion(name, description, date, picture_url, emotion):
         print("Event added successfully!")
     else:
         print(f"Failed to add event. Status code: {response.status_code}, {response.text}")
+        raise Exception("Failed to add event")
 
 if __name__ == "__main__":
 
     add_event_to_notion(
     name="Sample Event",
     description="",
-    date=datetime.date(2024, 11, 15),
+    date="2024-11-13",
     picture_url="",
     emotion="happy",
     )

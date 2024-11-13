@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 import os
 from discord.ext import commands
 import discord
-import datetime
+from datetime import datetime
 import notion
+import pytz
 
 load_dotenv()
 
@@ -20,9 +21,20 @@ async def on_ready():
     print(f'Logged in as {bot.user}!')
 
 @bot.command()
-async def add_entry(ctx, name: str, description: str, date: str, emotion: str, picture: str = None):
+async def add(ctx, name: str, description: str, edate: str, emotion: str, picture: str = None):
+    
+    entry_date = ""
+    tz = pytz.timezone('America/Argentina/Buenos_Aires')
+    
     try:
-        entry_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        if edate == "":
+            entry_date = datetime.now()
+            entry_date = tz.localize(entry_date)
+            entry_date = entry_date.strftime("%Y-%m-%d")
+        else:
+            entry_date = datetime.strptime(edate, "%Y-%m-%d")
+            entry_date = tz.localize(entry_date)
+            entry_date = entry_date.strftime("%Y-%m-%d")
     except ValueError:
         await ctx.send("Invalid date format! Please use YYYY-MM-DD.")
         return
@@ -30,27 +42,35 @@ async def add_entry(ctx, name: str, description: str, date: str, emotion: str, p
     if not picture and ctx.message.attachments:
         picture = ctx.message.attachments[0].url
 
-    embed = discord.Embed(
-        title=f"{name}'s Entry",
-        description=f"{description}",
-        color=discord.Color.blue()
-    )
+    try:
 
-    embed.add_field(name="Date", value=entry_date.strftime("%Y-%m-%d"), inline=False)
-    embed.add_field(name="Emotion", value=emotion.capitalize(), inline=False)
+        notion.add_event_to_notion(
+        name=name,
+        description=description,
+        date=entry_date,
+        picture_url=picture,
+        emotion=emotion.lower(),
+        )
 
-    if picture:
-        embed.set_image(url=picture)
-    embed.set_footer(text=f"Added by {ctx.author}")
+        embed = discord.Embed(
+            title=f"Entry added successfully",
+            description=name,
+            color=discord.Color.blue()
+            )
+            
+        embed.add_field(name="Description", value=description, inline=False)
+        embed.add_field(name="Date", value=entry_date, inline=False)
+        embed.add_field(name="Emotion", value=emotion.capitalize(), inline=False)
 
-    notion.add_event_to_notion(
-    name=name,
-    description=description,
-    date=datetime.datetime.strptime(date, "%Y-%m-%d"),
-    picture_url=picture,
-    emotion=emotion,
-    )
+        if picture:
+            embed.set_image(url=picture)
+        embed.set_footer(text=f"Added by {ctx.author}")
 
-    await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
+
+    except Exception as e:
+
+        await ctx.send(e)
+
 
 bot.run(BOT_TOKEN)
