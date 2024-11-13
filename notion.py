@@ -25,11 +25,11 @@ emotions = {
     "anger":{"relation": [{"id": "Anger-1318842944f480adb28fc5feada0af8a"}]}
 }
 
-def add_event_to_notion(name, description, date, picture_url, emotion, database_id):
+def add_event_to_notion(name, description, date, picture_url, emotion):
 
 
     payload = {
-        "parent": {"database_id": database_id},
+        "parent": {"database_id": databaseID},
         "properties": {
             "Name": {
                 "title": [
@@ -42,7 +42,7 @@ def add_event_to_notion(name, description, date, picture_url, emotion, database_
             },
             "Date": {
                 "date": {
-                    "start": date.isoformat()
+                    "start": date
                 }
             },
             "Emotion": emotions[emotion]
@@ -63,7 +63,7 @@ def add_event_to_notion(name, description, date, picture_url, emotion, database_
 
     if picture_url:
 
-        payload["properties"]["Picture"] = {
+        payload["properties"]["Pictures"] = {
                 "files": [
                     {
                         "name": "Event Picture",
@@ -89,5 +89,4 @@ if __name__ == "__main__":
     date=datetime.date(2024, 11, 15),
     picture_url="",
     emotion="happy",
-    database_id=databaseID
     )

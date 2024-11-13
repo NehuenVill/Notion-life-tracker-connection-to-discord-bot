@@ -4,6 +4,7 @@ import os
 from discord.ext import commands
 import discord
 import datetime
+import notion
 
 load_dotenv()
 
@@ -41,6 +42,14 @@ async def add_entry(ctx, name: str, description: str, date: str, emotion: str, p
     if picture:
         embed.set_image(url=picture)
     embed.set_footer(text=f"Added by {ctx.author}")
+
+    notion.add_event_to_notion(
+    name=name,
+    description=description,
+    date=datetime.datetime.strptime(date, "%Y-%m-%d"),
+    picture_url=picture,
+    emotion=emotion,
+    )
 
     await ctx.send(embed=embed)
 
