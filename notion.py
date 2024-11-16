@@ -1,14 +1,16 @@
 import datetime
 import json, requests
 from unicodedata import name
-from dotenv import load_dotenv
 import os
+import dotenv
 
-load_dotenv()
+dotenv.load_dotenv()
 
 NOTION_TOKEN = os.environ["NOTION_TOKEN"]
 
-databaseID ="1308842944f4819bad7bf04047749d9a"
+databaseID_le ="1308842944f4819bad7bf04047749d9a"
+databaseID_exp ="12e8842944f480548fb3ce513335e8bb"
+
 headers = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
     "Content-Type": "application/json",
@@ -25,11 +27,18 @@ emotions = {
     "anger":{"relation": [{"id":   "1318842944f480adb28fc5feada0af8a"}]}
 }
 
+months = {
+    "11":{"relation": [{"id":"12e8842944f4802a9371d951622b615e"}]},
+    "12":{"relation": [{"id":"12e8842944f4809699abfd729f4eaf61"}]}
+    }
+
+categories = ["Treats", "Taxes", "Personal", "Groceries", "Car", "Charity"]
+
 def add_event_to_notion(name, description, date, picture_url, emotion):
 
 
     payload = {
-        "parent": {"database_id": databaseID},
+        "parent": {"database_id": databaseID_le},
         "properties": {
             "Name": {
                 "title": [
@@ -82,12 +91,55 @@ def add_event_to_notion(name, description, date, picture_url, emotion):
         print(f"Failed to add event. Status code: {response.status_code}, {response.text}")
         raise Exception("Failed to add event")
 
+def add_expense(name, date, amount, category):
+
+    if category not in categories:
+
+        raise Exception(f"Category should be one of the following: {categories}")
+
+    payload = {
+        "parent": {"database_id": databaseID_exp},
+        "properties": {
+            "Name": {
+                "title": [
+                    {
+                        "text": {
+                            "content": name
+                        }
+                    }
+                ]
+            },
+            "Date": {
+                "date": {
+                    "start": date
+                }
+            },
+            "Months": months[date[5:7]],
+            "Amount":{
+                "number": amount
+                },
+            "Category": {
+                "select": {
+                    "name": category
+                }
+            }
+        }
+    }
+
+    response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=payload)
+
+    if response.status_code == 200:
+        print("Expense added successfully!")
+    else:
+        print(f"Failed to add event. Status code: {response.status_code}, {response.text}")
+        raise Exception("Failed to add event")
+
+
 if __name__ == "__main__":
 
-    add_event_to_notion(
-    name="Sample Event",
-    description="",
-    date="2024-11-13",
-    picture_url="",
-    emotion="happy",
+    add_expense(
+    name="Sample expense",
+    date="2024-11-18",
+    amount=15,
+    category="Car"
     )
