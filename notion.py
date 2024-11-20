@@ -1,10 +1,6 @@
-import datetime
-import json, requests
-from unicodedata import name
+import requests
 import os
-import dotenv
 
-dotenv.load_dotenv()
 
 NOTION_TOKEN = os.environ["NOTION_TOKEN"]
 
